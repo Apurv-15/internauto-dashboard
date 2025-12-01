@@ -1,0 +1,5 @@
+{
+  "name": "InternAuto Dashboard",
+  "description": "A comprehensive command center for managing internship applications. Features include search configuration, application tracking, simulated bot logs, and AI-powered cover letter generation using Gemini.",
+  "requestFramePermissions": []
+}
