@@ -12,6 +12,16 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the React app
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from the parent directory's dist folder
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
 // Store browser instance and page
 let browser = null;
 let page = null;
@@ -480,6 +490,11 @@ process.on('SIGINT', async () => {
     await browser.close();
   }
   process.exit(0);
+});
+
+// Catch-all handler for any request that doesn't match an API route
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
