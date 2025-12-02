@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import puppeteer from 'puppeteer';
 import dotenv from 'dotenv';
+import { SYSTEM_CONFIG } from './auth_config.js';
 
 dotenv.config();
 
