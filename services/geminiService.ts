@@ -1,8 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const API_KEY = import.meta.env.VITE_API_KEY;
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 export const generateCoverLetterAnswer = async (question: string, keywords: string, resumeSummary: string): Promise<string> => {
+  if (!ai) {
+    return "AI feature disabled. Please add VITE_API_KEY to enable automatic answer generation.";
+  }
+
   try {
     const prompt = `
       You are an expert career coach helping a student apply for an internship.
@@ -30,7 +35,11 @@ export const generateCoverLetterAnswer = async (question: string, keywords: stri
 };
 
 export const analyzeResume = async (resumeText: string): Promise<string> => {
-     try {
+  if (!ai) {
+    return "AI resume analysis disabled. Upload a resume to manually enter your skills.";
+  }
+
+  try {
     const prompt = `
       Analyze the following resume text and provide a concise summary of the candidate's top 5 technical skills and 3 soft skills.
       
