@@ -28,12 +28,25 @@ let page = null;
 let isLoggedIn = false;
 
 // Helper function to initialize browser
+// Helper function to initialize browser
 async function initBrowser() {
   if (!browser) {
-    browser = await puppeteer.launch({
-      headless: false, // Set to true for production
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    const launchOptions = {
+      headless: true, // Must be true for production
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
+      ]
+    };
+
+    // Check if running on Render (PUPPETEER_SKIP_CHROMIUM_DOWNLOAD is a good indicator)
+    if (process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD === 'true' || process.env.RENDER) {
+      launchOptions.executablePath = '/usr/bin/google-chrome-stable';
+    }
+
+    browser = await puppeteer.launch(launchOptions);
   }
   if (!page) {
     page = await browser.newPage();
