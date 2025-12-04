@@ -23,21 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
-server/error_exception_1764586019846.png
-server/error_exception_1764586025305.png
-server/error_exception_1764586039463.png
-server/error_exception_1764587843212.png
-server/error_exception_1764587836613.png
-server/error_exception_1764586035472.png
-server/error_exception_1764589077014.png
-server/error_exception_1764589080522.png
-server/error_exception_1764587863488.png
-server/error_exception_1764587846608.png
-server/error_no_button_2025-12-01T11-17-25-553Z.png
-server/error_no_button_2025-12-01T11-17-26-002Z.png
-server/error_no_button_2025-12-01T11-17-41-307Z.png
-server/error_no_button_2025-12-01T11-37-59-302Z.png
-server/error_no_button_2025-12-01T11-37-59-779Z.png
-
+# Error screenshots
+error_exception_*.png
+server/error_exception_*.png
+server/error_no_button_*.png
+error_no_button_*.png
 server/auth_config.js
 RENDER_DEPLOY.md
+render.env
+ALL_ENV_VARS.txt

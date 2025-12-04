@@ -20,6 +20,12 @@ fi
 
 echo ""
 echo "✅ Starting backend server..."
+
+# Auto-kill any existing backend process on port 3001
+echo "🧹 Cleaning up existing backend processes..."
+lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+sleep 1
+
 # Run backend in a subshell so we don't change the current directory
 (cd "$PROJECT_ROOT/server" && npm start) &
 BACKEND_PID=$!

@@ -1,8 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { createCursor } from 'ghost-cursor';
 import dotenv from 'dotenv';
 import { SYSTEM_CONFIG } from './auth_config.js';
+
+// Use stealth plugin to hide automation and bypass CAPTCHA
+puppeteer.use(StealthPlugin());
 
 dotenv.config();
 
@@ -32,13 +37,19 @@ let isLoggedIn = false;
 async function initBrowser() {
   if (!browser) {
     const launchOptions = {
-      headless: true, // Must be true for production
+      headless: false, // Keep visible so you can manually click the login button
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-gpu'
-      ]
+        '--disable-gpu',
+        '--disable-blink-features=AutomationControlled', // Critical for stealth
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--window-size=1920,1080',
+        '--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      ],
+      ignoreDefaultArgs: ['--enable-automation'], // Don't show "Chrome is being controlled"
+      ignoreHTTPSErrors: true
     };
 
     // Check if running on Render (PUPPETEER_SKIP_CHROMIUM_DOWNLOAD is a good indicator)
@@ -50,8 +61,28 @@ async function initBrowser() {
   }
   if (!page) {
     page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 800 });
-    // Set user agent to avoid detection
+
+    // Set realistic viewport
+    await page.setViewport({ width: 1920, height: 1080 });
+
+    // Override navigator properties to hide automation
+    await page.evaluateOnNewDocument(() => {
+      // Remove webdriver property
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined
+      });
+
+      // Mock plugins and languages
+      Object.defineProperty(navigator, 'languages', {
+        get: () => ['en-US', 'en']
+      });
+
+      Object.defineProperty(navigator, 'plugins', {
+        get: () => [1, 2, 3, 4, 5]
+      });
+    });
+
+    // Set user agent
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
   }
   return { browser, page };
@@ -74,11 +105,22 @@ app.post('/api/verify-credentials', async (req, res) => {
     // Wait for login form
     await page.waitForSelector('#email', { timeout: 10000 });
 
-    // Fill in credentials
+    // Wait a bit for page to be fully ready
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Fill in credentials - simple and reliable
+    console.log('Filling email...');
     await page.type('#email', email, { delay: 100 });
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    console.log('Filling password...');
     await page.type('#password', password, { delay: 100 });
 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     // Click login button
+    console.log('Clicking login button...');
     await page.click('#login_submit');
 
     // Wait for navigation
