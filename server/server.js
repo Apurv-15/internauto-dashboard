@@ -205,7 +205,7 @@ app.post('/api/search-internships', async (req, res) => {
       const results = [];
 
       cards.forEach((card, index) => {
-        if (index >= 20) return; // Limit to 20 results
+        if (index >= 100) return; // Limit to 100 results
 
         try {
           // Extract title
@@ -354,10 +354,10 @@ app.post('/api/apply-internship', async (req, res) => {
     }
 
     if (!foundSelector) {
-      // Take screenshot for debugging
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      // Take screenshot for debugging (DISABLED)
+      /* const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       await page.screenshot({ path: `error_no_button_${timestamp}.png` });
-      console.log(`Saved screenshot to error_no_button_${timestamp}.png`);
+      console.log(`Saved screenshot to error_no_button_${timestamp}.png`); */
 
       return res.json({
         success: false,
@@ -497,10 +497,10 @@ app.post('/api/apply-internship', async (req, res) => {
 
   } catch (error) {
     console.error('Apply error:', error);
-    // Take screenshot on error
-    try {
+    // Take screenshot on error (DISABLED)
+    /* try {
       if (page) await page.screenshot({ path: `error_exception_${Date.now()}.png` });
-    } catch (e) { }
+    } catch (e) { } */
 
     res.status(500).json({
       success: false,
